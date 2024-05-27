@@ -4,7 +4,7 @@ This file contains the main functions used in ALMA-ECOGAL experiment testing LNA
 
 @author: Francesco Andreetto
 
-May 21st 2024, Garching Bei München (Germany)
+May 21st 2024, Garching Bei München (Germany) - May 27th 2024, Brescia (Italy)
 """
 
 # Libraries & Modules
