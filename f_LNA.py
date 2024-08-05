@@ -4,7 +4,7 @@ This file contains the main functions used in ALMA-ECOGAL experiment testing LNA
 
 @author: Francesco Andreetto
 
-May 21st 2024, Garching Bei München (Germany)
+May 21st 2024, Garching Bei München (Germany) - May 27th 2024, Brescia (Italy)
 """
 
 # Libraries & Modules
@@ -32,7 +32,7 @@ def Load_LNAs_Data(path: str, ESO_dataset: bool) -> []:
     # Create a list to include all .txt files
     file_names = [file for file in all_files if file.endswith('.txt')]
 
-    # Create a list to store names without the .txt extension
+    # Create a list to store names removing the .txt extension
     names = [os.path.splitext(file)[0] for file in file_names]
 
     # Initialize an empty list to contain dataset
@@ -131,15 +131,17 @@ def Plot_Single_Noise_Gain(data: list, names: list, ESO_dataset: bool, noise_spe
         # Set axis limits
         ax1.axis([67, 116, 0, 60])
         # Set axis labels
-        ax1.set_xlabel("\nFrequency [GHz]\n", fontsize='25', color="black")
-        ax1.set_ylabel("\nNoise temperature [K]\n", fontsize='25', color="royalblue")
+        ax1.set_xlabel("\nFrequency [GHz]\n", fontsize=25, color="black")
+        ax1.tick_params(axis='both', which='major', labelsize=20)
+        ax1.set_ylabel("\nNoise temperature [K]\n", fontsize=25, color="royalblue")
 
         # Create a twin axis on the right side for the Gain
         ax2 = ax1.twinx()
         # Set axis limits
         ax2.axis([67, 116, 0, 60])  # necessary?
         # Set axis label
-        ax2.set_ylabel("\nGain [dB]\n", fontsize='25', color="firebrick")
+        ax2.set_ylabel("\nGain [dB]\n", fontsize=25, color="firebrick")
+        ax2.tick_params(axis='both', which='major', labelsize=20)
 
         # Checking existence of the dir
         Path(output_plot_dir).mkdir(parents=True, exist_ok=True)
@@ -174,7 +176,12 @@ def Plot_All_Noise_Gain(data: list, names: list, ESO_dataset: bool, noise_spec: 
     # Noise Temperature column: "3" for ESO data, "1" for LNF
     # Gain column: "1" for ESO, "2" for LNF
     NT_column, G_column = (3, 1) if ESO_dataset else (1, 2)
-
+    """
+    colors = ["firebrick", "orange", "gold",
+              "forestgreen", "lime", "teal",
+              "cyan", "deepskyblue", "darkblue",
+              "darkviolet", "purple", "crimson"]
+    """
     # ==================================================================================================================
     # Noise Temperature
     # ==================================================================================================================
@@ -189,12 +196,11 @@ def Plot_All_Noise_Gain(data: list, names: list, ESO_dataset: bool, noise_spec: 
     for i in range(0, len(data)):
         # Plotting Frequency (column 0) vs Gain (G_column)
         logging.debug(names[i])
-        plt.plot(data[i][:, 0], data[i][:, G_column], linewidth=2, label=names[i])
+        plt.plot(data[i][:, 0], data[i][:, G_column], linewidth=2)
 
     # Make legend for the plot
     plt.subplots_adjust(bottom=0.4)
     plt.legend(loc='upper center', shadow=True, fontsize='17', bbox_to_anchor=(0.5, -0.1))
-    plt.tick_params(axis='both', which='major', labelsize=20, color="red")
 
     # =============================================================================
     # Noise Specifics
@@ -203,6 +209,7 @@ def Plot_All_Noise_Gain(data: list, names: list, ESO_dataset: bool, noise_spec: 
         ax1.text(80, 23, "Noise Specs, 80%", horizontalalignment='center', fontsize='25')
         ax1.plot([90, 116], [29, 29], color='k', linestyle='--', linewidth=2)
         ax1.text(105, 30, "Noise Specs, 80%", horizontalalignment='center', fontsize='25')
+        ax1.tick_params(axis='both', which='major', labelsize=20)
         plot_name += f"{noise_spec}"
 
     elif noise_spec == 100:
@@ -210,6 +217,7 @@ def Plot_All_Noise_Gain(data: list, names: list, ESO_dataset: bool, noise_spec: 
         ax1.text(80, 27, "Noise Specs, 100%", horizontalalignment='center', fontsize='25')
         ax1.plot([90, 116], [33, 33], color='k', linestyle='-', linewidth=2)
         ax1.text(105, 34, "Noise Specs, 100%", horizontalalignment='center', fontsize='25')
+        ax1.tick_params(axis='both', which='major', labelsize=20)
         plot_name += f"{noise_spec}"
 
     else:
@@ -227,6 +235,7 @@ def Plot_All_Noise_Gain(data: list, names: list, ESO_dataset: bool, noise_spec: 
     # Set axis labels
     ax1.set_xlabel("Frequency [GHz]", fontsize='25', color="black")
     ax1.set_ylabel("Noise temperature [K]", fontsize='25', color="black")
+    ax1.tick_params(axis='both', which='major', labelsize=20)
 
     # Create a twin axis on the right side for the Gain
     ax2 = ax1.twinx()
@@ -234,6 +243,7 @@ def Plot_All_Noise_Gain(data: list, names: list, ESO_dataset: bool, noise_spec: 
     ax2.axis([67, 116, 0, 60])  # necessary?
     # Set axis label
     ax2.set_ylabel("Gain [dB]", fontsize='25', color="black")
+    ax2.tick_params(axis='both', which='major', labelsize=20)
 
     # Checking existence of the dir
     Path(output_plot_dir).mkdir(parents=True, exist_ok=True)
