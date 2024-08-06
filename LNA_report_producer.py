@@ -420,8 +420,6 @@ def main():
     # Add Plot of the LNA
     fr.add_figure(doc=doc, img_path=f"LNA_Plots/ALL/Plot_All.png",
                   caption_file="none", img_width=450, img_height=450)
-    
-    ####################################################################################################################
     # Move the "End of document" text at the very end of the document
     fr.move_text_to_end(doc=doc, search_text="--- End of document ---", output_path=f"{output_path}")
 
