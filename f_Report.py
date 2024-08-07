@@ -420,6 +420,11 @@ def load_dict_from_datafile(file_path: str) -> dict:
     return data_dict
 
 
+def estimate_text_width(text, font_size):
+    # Give an estimation of the width of the text based on the number of char and on font dimension
+    return len(text) * (font_size * 0.6) / 72  # Convert to inches
+
+
 def make_table(doc: Document, data: dict, title: str, header_font_size=12, elements_font_size=7):
     """
     Create a table on a docx from a dictionary.
@@ -443,30 +448,37 @@ def make_table(doc: Document, data: dict, title: str, header_font_size=12, eleme
 
     # Add the heading to the table
     head = new_table.rows[0].cells
+    max_widths = []
+
     for i, col in enumerate(data.keys()):
         # Set the headers to the columns
         head[i].text = col
+        max_width = estimate_text_width(col, header_font_size)
+        max_widths.append(max_width)
         for run in head[i].paragraphs[0].runs:
             # Set font of the headers
             run.font.bold = True
             run.font.size = Pt(header_font_size)
 
-    # Add datas from dictionary to the table
+    # Add data from dictionary to the table
     for i, key in enumerate(data.keys()):
         for j, val in enumerate(data[key]):
             # Get the correct cell
             cell = new_table.cell(j + 1, i)
             # Write the text in the cell
             cell.text = str(val)
+            text_width = estimate_text_width(str(val), elements_font_size)
+            if text_width > max_widths[i]:
+                max_widths[i] = text_width
             for paragraph in cell.paragraphs:
                 for run in paragraph.runs:
                     # Set font size of the elements of the table
                     run.font.size = Pt(elements_font_size)
 
-    # Set column widths to None for automatic adjustment
-    for col in new_table.columns:
-        for cell in col.cells:
-            cell.width = None
+    # Set column widths
+    for i, width in enumerate(max_widths):
+        for cell in new_table.columns[i].cells:
+            cell.width = Inches(width)
 
 
 def move_text_to_end(doc: Document, search_text: str, output_path: str):
