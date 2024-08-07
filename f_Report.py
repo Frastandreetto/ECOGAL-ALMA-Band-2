@@ -423,7 +423,7 @@ def load_dict_from_datafile(file_path: str) -> dict:
 def make_table(doc: Document, data: dict, title: str, header_font_size=12, elements_font_size=7):
     """
     Create a table on a docx from a dictionary.
-    The keys of the dictionary will be the headers of the table and thy will be written in bold.
+    The keys of the dictionary will be the headers of the table and they will be written in bold.
     Parameters:\n
     - **doc** (``Document``): docx on which write the paragraph;
     - **data** (``dict``): dictionary with all the slots of the table;
@@ -449,7 +449,7 @@ def make_table(doc: Document, data: dict, title: str, header_font_size=12, eleme
         for run in head[i].paragraphs[0].runs:
             # Set font of the headers
             run.font.bold = True
-            run.font.size = Pt(elements_font_size)
+            run.font.size = Pt(header_font_size)
 
     # Add datas from dictionary to the table
     for i, key in enumerate(data.keys()):
@@ -462,6 +462,11 @@ def make_table(doc: Document, data: dict, title: str, header_font_size=12, eleme
                 for run in paragraph.runs:
                     # Set font size of the elements of the table
                     run.font.size = Pt(elements_font_size)
+
+    # Set column widths to None for automatic adjustment
+    for col in new_table.columns:
+        for cell in col.cells:
+            cell.width = None
 
 
 def move_text_to_end(doc: Document, search_text: str, output_path: str):
