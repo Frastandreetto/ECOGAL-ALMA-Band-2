@@ -168,7 +168,7 @@ def main():
     # Reference Documents List
     ref_dict = fr.load_dict_from_datafile("Tables/reference_document_list.txt")
     # Make the Reference Document List Table
-    fr.make_table(doc=doc, data=ref_dict, title="\n")
+    fr.make_table(doc=doc, data=ref_dict, title="\n", elements_font_size=8, header_font_size=10)
 
     logging.info("Section 1 completed\n"
                  "==================================================================\n")
@@ -315,7 +315,7 @@ def main():
         # Load the dictionary
         data = fr.load_dict_from_filename(filename_path=f"{dir_path}/{filename}")
         # Write the set-values on the table in the doc
-        fr.make_table(doc=doc, data=data, title=table_title)
+        fr.make_table(doc=doc, data=data, title=table_title, header_font_size=8, elements_font_size=8)
         #  =============================================================================================================
 
         # Add some white space between the two tables
@@ -335,7 +335,7 @@ def main():
         # Load the dictionary reading the configuration files
         data = fr.load_dict_from_datafile(f"Tables/bias_table_{name_LNA_1}_{name_LNA_2}.txt")
         # Write the read-values on the table in the doc
-        fr.make_table(doc=doc, data=data, title=table_title)
+        fr.make_table(doc=doc, data=data, title=table_title, header_font_size=8, elements_font_size=8)
 
         # Add some white space before the figure
         doc.add_paragraph(' ')
@@ -413,7 +413,7 @@ def main():
 
     # Write the heading of the section
     sect_counter += 1
-    text = f"Summary of all CLNAs performance"
+    text = f"Noise Temperature and Gain of all cascaded chains"
     fr.write_nice_heading(doc=doc, text=text, level=1,
                           font_color=RGBColor(0, 0, 0), font_name="Times New Roman",
                           font_size=18, font_style="italic")

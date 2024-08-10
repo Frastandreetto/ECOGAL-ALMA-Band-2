@@ -18,6 +18,7 @@ import re
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT, WD_ALIGN_PARAGRAPH
+from docx.oxml import OxmlElement
 
 
 def add_figure(doc: Document, img_path: str, caption_file: str, img_width=400, img_height=400,
@@ -421,16 +422,21 @@ def load_dict_from_datafile(file_path: str) -> dict:
 
 
 def estimate_text_width(text, font_size):
-    # Give an estimation of the width of the text based on the number of char and on font dimension
-    return len(text) * (font_size * 0.6) / 72  # Convert to inches
+    """
+    Estimate the width of text in inches based on character count and font size.
+    """
+    avg_char_width = 0.5  # Average character width in inches (approximation)
+    text_length = len(text)
+    return avg_char_width * text_length * (font_size / 8)
 
 
-def make_table(doc: Document, data: dict, title: str, header_font_size=12, elements_font_size=7):
+def make_table(doc: Document, data: dict, title: str, header_font_size=10, elements_font_size=7):
     """
     Create a table on a docx from a dictionary.
-    The keys of the dictionary will be the headers of the table and they will be written in bold.
-    Parameters:\n
-    - **doc** (``Document``): docx on which write the paragraph;
+    The keys of the dictionary will be the headers of the table, written in bold.
+
+    Parameters:
+    - **doc** (``Document``): docx on which to write the paragraph;
     - **data** (``dict``): dictionary with all the slots of the table;
     - **title** (``str``): title of the table;
     - **header_font_size** (``int``): size of the headers;
@@ -439,9 +445,9 @@ def make_table(doc: Document, data: dict, title: str, header_font_size=12, eleme
     # Add a title for the table
     write_nice_heading(doc=doc, text=f"{title}", level=0,
                        font_color=RGBColor(0, 0, 0), font_name='Times New Roman',
-                       font_size=header_font_size, font_style="italic")
+                       font_size=12, font_style="italic")
 
-    # Create a table with number of row and column (+1 for the heading)
+    # Create a table with number of rows and columns (+1 for the heading)
     num_rows = len(next(iter(data.values()))) + 1
     num_col = len(data)
     new_table = doc.add_table(rows=num_rows, cols=num_col)
@@ -475,10 +481,16 @@ def make_table(doc: Document, data: dict, title: str, header_font_size=12, eleme
                     # Set font size of the elements of the table
                     run.font.size = Pt(elements_font_size)
 
-    # Set column widths
+    # Set column widths and apply noWrap to all cells
     for i, width in enumerate(max_widths):
         for cell in new_table.columns[i].cells:
+            # Set cell width based on calculated max width
             cell.width = Inches(width)
+            # Apply noWrap to each cell
+            tc = cell._element
+            tcPr = tc.get_or_add_tcPr()
+            no_wrap = OxmlElement('w:noWrap')
+            tcPr.append(no_wrap)
 
 
 def move_text_to_end(doc: Document, search_text: str, output_path: str):
