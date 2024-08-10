@@ -146,7 +146,7 @@ def main():
                           font_color=RGBColor(0, 0, 0), font_name="Times New Roman",
                           font_size=16, font_style="normal")
     # Read Subsection 1.1
-    text = fr.read_text_from_file("Sections/pag4_sec1_1.txt")
+    text = fr.read_text_from_file("Sections/Sec1_1.txt")
     # Write Subsection 1.1
     fr.write_nice_text(doc=doc, text=text, output_path=output_path)
 
@@ -156,7 +156,7 @@ def main():
                           font_color=RGBColor(0, 0, 0), font_name="Times New Roman",
                           font_size=16, font_style="normal")
     # Read Subsection 1.2
-    text = fr.read_text_from_file("Sections/pag4_sec1_2.txt")
+    text = fr.read_text_from_file("Sections/Sec1_2.txt")
     # Write Subsection 1.2
     fr.write_nice_text(doc=doc, text=text, output_path=output_path)
 
@@ -188,7 +188,7 @@ def main():
                           font_color=RGBColor(0, 0, 0), font_name="Times New Roman",
                           font_size=18, font_style="bold")
     # Read Section 2
-    text = fr.read_text_from_file("Sections/pag5_sec2.txt")
+    text = fr.read_text_from_file("Sections/Sec2.txt")
     # Write Section 2
     fr.write_nice_text(doc=doc, text=text, output_path=output_path)
 
@@ -225,7 +225,7 @@ def main():
                           font_color=RGBColor(0, 0, 0), font_name="Times New Roman",
                           font_size=18, font_style="bold")
     # Read Section 3
-    text = fr.read_text_from_file("Sections/pag7_sec3.txt")
+    text = fr.read_text_from_file("Sections/Sec3.txt")
     # Write Section 3
     fr.write_nice_text(doc=doc, text=text, output_path=output_path)
 
@@ -235,7 +235,7 @@ def main():
     fr.add_figure(doc=doc, img_path=img_path, caption_file=caption_file, img_width=300, img_height=200)
 
     # Read Section 3 pt 2
-    text = fr.read_text_from_file("Sections/pag7_sec3_pt2.txt")
+    text = fr.read_text_from_file("Sections/Sec3_pt2.txt")
     # Write Section 3 pt2
     fr.write_nice_text(doc=doc, text=text, output_path=output_path)
 
@@ -245,7 +245,7 @@ def main():
     fr.add_figure(doc=doc, img_path=img_path, caption_file=caption_file, img_width=250)
 
     # Read Section 3 pt 3
-    text = fr.read_text_from_file("Sections/pag7_sec3_pt3.txt")
+    text = fr.read_text_from_file("Sections/Sec3_pt3.txt")
     # Write Section 3 pt3
     fr.write_nice_text(doc=doc, text=text, output_path=output_path)
 
