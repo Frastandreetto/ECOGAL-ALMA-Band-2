@@ -5,11 +5,10 @@ This file produces reports of the LNAs performances of Band 2 ALMA-ECOGAL experi
 @author: Francesco Andreetto
 
 Created on: May 23rd 2024, European Southern Observatory (ESO), Garching Bei München (Germany)
-Last editing: August 5th 2024, Observatory of Astrophysics and Space Science (INAF-OAS) - Bologna (Italy)
+Last editing: September 4th 2024,  European Southern Observatory (ESO) - Garching Bei München (Germany)
 """
 
 # Modules & Libraries
-
 import argparse
 import logging
 from docx import Document
@@ -23,6 +22,7 @@ from rich.logging import RichHandler
 logging.basicConfig(level="INFO", format='%(message)s',
                     datefmt="[%X]", handlers=[RichHandler()])
 
+#%%
 
 def main():
     # ==================================================================================================================
@@ -168,7 +168,7 @@ def main():
     # Reference Documents List
     ref_dict = fr.load_dict_from_datafile("Tables/reference_document_list.txt")
     # Make the Reference Document List Table
-    fr.make_table(doc=doc, data=ref_dict, title="\n", elements_font_size=8, header_font_size=10)
+    fr.make_table(doc=doc, data=ref_dict, title="\n", column_widths=[15, 43.5, 41.5], elements_font_size=8, header_font_size=10)
 
     logging.info("Section 1 completed\n"
                  "==================================================================\n")
@@ -205,7 +205,7 @@ def main():
     # Individual CLNAs Documents TABLE
     document_dict = fr.load_dict_from_datafile("Tables/CLNA_waivers.txt")
     # Make the Reference Document List Table
-    fr.make_table(doc=doc, data=document_dict, title=" ")
+    fr.make_table(doc=doc, data=document_dict, title=" ", column_widths=[20, 66.6, 13.4])
 
     logging.info("Section 2 completed\n"
                  "==================================================================\n")
@@ -276,9 +276,8 @@ def main():
     for idx, item in enumerate(plot_names):
 
         # Set margins of the section
-        fr.set_margins(doc, top=1, bottom=1, left=0.7, right=0.7)
+        fr.set_margins(doc, top=1.18, bottom=0.98, left=1.18, right=0.98)
 
-        # fr.write_chain_section(item)
         # Get the name of the first LNA
         name_LNA_1 = item[-26:-17]
 
@@ -315,7 +314,7 @@ def main():
         # Load the dictionary
         data = fr.load_dict_from_filename(filename_path=f"{dir_path}/{filename}")
         # Write the set-values on the table in the doc
-        fr.make_table(doc=doc, data=data, title=table_title, header_font_size=8, elements_font_size=8)
+        fr.make_table(doc=doc, data=data, title=table_title, column_widths=[16, 14, 14, 14, 14, 14, 14], header_font_size=8, elements_font_size=8)
         #  =============================================================================================================
 
         # Add some white space between the two tables
@@ -335,7 +334,7 @@ def main():
         # Load the dictionary reading the configuration files
         data = fr.load_dict_from_datafile(f"Tables/bias_table_{name_LNA_1}_{name_LNA_2}.txt")
         # Write the read-values on the table in the doc
-        fr.make_table(doc=doc, data=data, title=table_title, header_font_size=8, elements_font_size=8)
+        fr.make_table(doc=doc, data=data, title=table_title, column_widths=[16, 14, 14, 14, 14, 14, 14], header_font_size=8, elements_font_size=8)
 
         # Add some white space before the figure
         doc.add_paragraph(' ')

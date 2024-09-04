@@ -5,8 +5,7 @@ This file contains the main functions used in ALMA-ECOGAL project producing repo
 @author: Francesco Andreetto
 
 Created on: May 29th 2024, European Southern Observatory (ESO) - Garching Bei München (Germany)
-Last editing: August 5th 2024, Observatory of Astrophysics and Space Science (INAF-OAS) - Bologna (Italy)
-
+Last editing: September 4th 2024,  European Southern Observatory (ESO) - Garching Bei München (Germany)
 """
 
 # Import Modules
@@ -353,11 +352,11 @@ def get_lines_from_pdf(pdf_file_path: str) -> list:
     try:
         # Open the PDF file
         with open(pdf_file_path, 'rb') as file:
-            reader = PyPDF2.PdfFileReader(file)
+            reader = PyPDF2.PdfReader(file)
             all_lines = []
 
             # Iterate through all the pages in the PDF
-            for page_num in range(reader.numPages):
+            for page_num in range(len(reader.pages)):
                 # Extract text from each page
                 page_text = reader.getPage(page_num).extract_text()
                 if page_text:
@@ -426,9 +425,92 @@ def estimate_text_width(text, font_size):
     """
     Estimate the width of text in inches based on character count and font size.
     """
-    avg_char_width = 0.5  # Average character width in inches (approximation)
+    # Average character width in inches (approximation)
+    avg_char_width = 0.5
     text_length = len(text)
-    return avg_char_width * text_length * (font_size / 8)
+    return avg_char_width * text_length * (font_size / 10)
+
+
+def make_table(doc: Document, data: dict, title: str, column_widths: list, header_font_size=10, elements_font_size=7):
+    """
+    Create a table on a docx from a dictionary with specified column widths as percentages.
+   
+    Parameters:
+    - **doc** (``Document``): docx on which to write the paragraph;
+    - **data** (``dict``): dictionary with all the slots of the table;
+    - **title** (``str``): title of the table;
+    - **column_widths** (``list``): list of percentages for each column width (should sum to 100);
+    - **header_font_size** (``int``): size of the headers;
+    - **elements_font_size** (``int``): size of the elements of the table.
+    """
+    # Validate column widths
+    if sum(column_widths) != 100:
+        raise ValueError("The sum of column widths percentages must equal 100.")
+
+
+    # Add a title for the table
+    write_nice_heading(doc=doc, text=f"{title}", level=0,
+                       font_color=RGBColor(0, 0, 0), font_name='Times New Roman',
+                       font_size=12, font_style="italic")
+
+    # Create a table with number of rows and columns (+1 for the heading)
+    num_rows = len(next(iter(data.values()))) + 1
+    num_col = len(data)
+    new_table = doc.add_table(rows=num_rows, cols=num_col)
+
+    # Add the heading to the table
+    head = new_table.rows[0].cells
+    for i, col in enumerate(data.keys()):
+        # Set the headers to the columns
+        head[i].text = col
+        for run in head[i].paragraphs[0].runs:
+            # Set font of the headers
+            run.font.bold = True
+            run.font.size = Pt(header_font_size)
+
+    # Add data from dictionary to the table
+    for i, key in enumerate(data.keys()):
+        for j, val in enumerate(data[key]):
+            # Get the correct cell
+            cell = new_table.cell(j + 1, i)
+            # Write the text in the cell
+            cell.text = str(val)
+            for paragraph in cell.paragraphs:
+                for run in paragraph.runs:
+                    # Set font size of the elements of the table
+                    run.font.size = Pt(elements_font_size)
+
+    # Set column widths as percentages of the total table width
+    # Set 6 inches for the width of the entire table
+    table_width_in_inches = 7  
+    # Width in twentieths of an inch
+    total_table_width_twips = table_width_in_inches * 1440  
+
+    for i, width_percentage in enumerate(column_widths):
+        col = new_table.columns[i]
+        column_width_twips = int(total_table_width_twips * (width_percentage / 100))
+        for cell in col.cells:
+            cell_element = cell._element
+            cell_pr = cell_element.get_or_add_tcPr()
+            # Clear previous width setting if any
+            tc_w = cell_pr.find(qn('w:tcW'))
+            if tc_w is not None:
+                cell_pr.remove(tc_w)
+            # Set new width
+            tc_w = OxmlElement('w:tcW')
+            tc_w.set(qn('w:w'), str(column_width_twips))
+            # Measurement type in twentieths of an inch
+            tc_w.set(qn('w:type'), 'dxa')  
+            cell_pr.append(tc_w)
+            # Optionally, set vertical alignment
+            v_align = OxmlElement('w:vAlign')
+            v_align.set(qn('w:val'), 'top')
+            cell_pr.append(v_align)
+
+    # Set borders for all cells in the table
+    for row in new_table.rows:
+        for cell in row.cells:
+            set_cell_borders(cell)
 
 
 def move_text_to_end(doc: Document, search_text: str, output_path: str):
@@ -466,87 +548,6 @@ def move_text_to_end(doc: Document, search_text: str, output_path: str):
     doc.save(output_path)
 
 
-def make_table(doc: Document, data: dict, title: str, header_font_size=10, elements_font_size=7):
-    """
-    Create a table on a docx from a dictionary.
-    The keys of the dictionary will be the headers of the table, written in bold.
-    """
-    # Add a title for the table
-    write_nice_heading(doc=doc, text=f"{title}", level=0,
-                       font_color=RGBColor(0, 0, 0), font_name='Times New Roman',
-                       font_size=12, font_style="italic")
-
-    # Create a table with number of rows and columns (+1 for the heading)
-    num_rows = len(next(iter(data.values()))) + 1
-    num_col = len(data)
-    new_table = doc.add_table(rows=num_rows, cols=num_col)
-
-    # Add the heading to the table
-    head = new_table.rows[0].cells
-    max_widths = []
-
-    for i, col in enumerate(data.keys()):
-        # Set the headers to the columns
-        head[i].text = col
-        max_width = estimate_text_width(col, header_font_size)
-        max_widths.append(max_width)
-        for run in head[i].paragraphs[0].runs:
-            # Set font of the headers
-            run.font.bold = True
-            run.font.size = Pt(header_font_size)
-
-    # Add data from dictionary to the table
-    for i, key in enumerate(data.keys()):
-        for j, val in enumerate(data[key]):
-            # Get the correct cell
-            cell = new_table.cell(j + 1, i)
-            # Write the text in the cell
-            cell.text = str(val)
-            text_width = estimate_text_width(str(val), elements_font_size)
-            if text_width > max_widths[i]:
-                max_widths[i] = text_width
-            for paragraph in cell.paragraphs:
-                for run in paragraph.runs:
-                    # Set font size of the elements of the table
-                    run.font.size = Pt(elements_font_size)
-
-    # Set column widths and apply noWrap to all cells
-    for i, width in enumerate(max_widths):
-        for cell in new_table.columns[i].cells:
-            # Set cell width based on calculated max width
-            cell.width = Inches(width)
-            # Apply noWrap to each cell
-            tc = cell._element
-            tcPr = tc.get_or_add_tcPr()
-            no_wrap = OxmlElement('w:noWrap')
-            tcPr.append(no_wrap)
-            # Apply borders to each cell
-            set_cell_borders(cell)
-
-    # Optionally set table borders
-    tbl = new_table._tbl
-    tblPr = tbl.tblPr
-    tblBorders = OxmlElement('w:tblBorders')
-
-    # Define border settings for the table
-    border_settings = {
-        'w:top': '1',
-        'w:left': '1',
-        'w:bottom': '1',
-        'w:right': '1',
-        'w:insideH': '1',
-        'w:insideV': '1'
-    }
-
-    for border, size in border_settings.items():
-        border_elem = OxmlElement(border)
-        border_elem.set(qn('w:val'), 'single')
-        border_elem.set(qn('w:sz'), size)  # size in half-points
-        tblBorders.append(border_elem)
-
-    tblPr.append(tblBorders)
-
-
 def pdf_to_text(pdf_path, output_txt):
     """
     Extracts text from a PDF file and writes it to a text file.
@@ -558,7 +559,7 @@ def pdf_to_text(pdf_path, output_txt):
 
     # Open the PDF file in read-binary mode
     with open(pdf_path, 'rb') as pdf_file:
-        # Create a PdfReader object instead of PdfFileReader
+        # Create a PdfReader object
         pdf_reader = PyPDF2.PdfReader(pdf_file)
 
         # Initialize an empty string to store the text
@@ -727,47 +728,47 @@ def load_dict_from_filename(filename_path: str) -> dict:
 
 def set_cell_borders(cell, border_size=1):
     """Set borders for a single cell."""
-
+   
     # Access the underlying XML element of the cell
     cell_element = cell._element
-
+   
     # Get or create the cell properties (tcPr) XML element
     cell_pr = cell_element.get_or_add_tcPr()
-
+   
     # Find the tblBorders element in the cell properties, which defines border settings
     borders = cell_pr.find(qn('w:tblBorders'))
-
+   
     # If the tblBorders element does not exist, create and append it
     if borders is None:
         borders = OxmlElement('w:tblBorders')
         cell_pr.append(borders)
-
+   
     # Define border settings for different sides and inner borders
     border_settings = {
-        'w:top': border_size,  # Top border
-        'w:left': border_size,  # Left border
-        'w:bottom': border_size,  # Bottom border
-        'w:right': border_size,  # Right border
-        'w:insideH': border_size,  # Horizontal inner borders (between cells)
-        'w:insideV': border_size  # Vertical inner borders (between cells)
+        'w:top': border_size,       # Top border
+        'w:left': border_size,      # Left border
+        'w:bottom': border_size,    # Bottom border
+        'w:right': border_size,     # Right border
+        'w:insideH': border_size,   # Horizontal inner borders (between cells)
+        'w:insideV': border_size    # Vertical inner borders (between cells)
     }
 
     # Iterate through each border setting
     for border, size in border_settings.items():
         # Find the specific border element within tblBorders
         border_elem = borders.find(qn(border))
-
+       
         # If the border element does not exist, create and append it
         if border_elem is None:
             border_elem = OxmlElement(border)
             borders.append(border_elem)
-
+       
         # Set the border style to 'single'
         border_elem.set(qn('w:val'), 'single')
-
+       
         # Set the border size in half-points
         border_elem.set(qn('w:sz'), str(size))
-
+        
     return
 
 
@@ -790,3 +791,5 @@ def set_margins(document, top, bottom, left, right):
         section.bottom_margin = Inches(bottom)
         section.left_margin = Inches(left)
         section.right_margin = Inches(right)
+        
+    return
