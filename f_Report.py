@@ -358,7 +358,7 @@ def get_lines_from_pdf(pdf_file_path: str) -> list:
             # Iterate through all the pages in the PDF
             for page_num in range(len(reader.pages)):
                 # Extract text from each page
-                page_text = reader.getPage(page_num).extract_text()
+                page_text = reader.pages[page_num].extract_text()
                 if page_text:
                     # Split text into lines and add them to the list
                     lines = page_text.split('\n')
