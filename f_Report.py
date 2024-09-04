@@ -19,6 +19,7 @@ from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT, WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 
 
 def add_figure(doc: Document, img_path: str, caption_file: str, img_width=400, img_height=400,
@@ -168,7 +169,7 @@ def extract_lna_bias_values(directory_path: str, lna1_name: str, lna2_name: str)
     """
     Extracts bias values for two LNAs from a txt file in the specified directory.
     Writes the extracted values into an output file in the 'Tables' directory (one level above the ``directory_path``)
-    The output file is named in the format 'bias_table_'``lna1_name``'_'``lna2_name``.txt', and contains a header line
+    The output file is named in the format 'bias_table_'``lna1_name``'_'``lna2_name``'.txt', and contains a header line
     followed by the extracted values for both LNAs in a structured format.
 
     Parameters:\n
@@ -430,17 +431,45 @@ def estimate_text_width(text, font_size):
     return avg_char_width * text_length * (font_size / 8)
 
 
+def move_text_to_end(doc: Document, search_text: str, output_path: str):
+    """
+    Move the paragraph containing the ``search_text`` to the end of the document and save to the specified path.
+
+    Parameters:
+    - **doc** (``Document``): The Document object;
+    - **search_text** (``str``): The text to search for and move;
+    - **output_path** (``str``): Path to save the modified document.
+    """
+
+    # Find the paragraph that contains the search text
+    para_to_move = None
+    for para in doc.paragraphs:
+        if search_text in para.text:
+            para_to_move = para
+            break
+
+    if para_to_move is None:
+        raise ValueError(f"Paragraph containing '{search_text}' not found.")
+
+    # Access the underlying XML of the document
+    doc_xml = doc._element
+    body = doc_xml.find('.//w:body', namespaces=doc_xml.nsmap)
+
+    # Remove the paragraph from its current position
+    para_element = para_to_move._element
+    body.remove(para_element)
+
+    # Append the paragraph to the end of the document
+    body.append(para_element)
+
+    # Save the modified document
+    doc.save(output_path)
+
+
 def make_table(doc: Document, data: dict, title: str, header_font_size=10, elements_font_size=7):
     """
     Create a table on a docx from a dictionary.
     The keys of the dictionary will be the headers of the table, written in bold.
-
-    Parameters:
-    - **doc** (``Document``): docx on which to write the paragraph;
-    - **data** (``dict``): dictionary with all the slots of the table;
-    - **title** (``str``): title of the table;
-    - **header_font_size** (``int``): size of the headers;
-    - **elements_font_size** (``int``): size of the elements of the table.
     """
     # Add a title for the table
     write_nice_heading(doc=doc, text=f"{title}", level=0,
@@ -491,41 +520,31 @@ def make_table(doc: Document, data: dict, title: str, header_font_size=10, eleme
             tcPr = tc.get_or_add_tcPr()
             no_wrap = OxmlElement('w:noWrap')
             tcPr.append(no_wrap)
+            # Apply borders to each cell
+            set_cell_borders(cell)
 
+    # Optionally set table borders
+    tbl = new_table._tbl
+    tblPr = tbl.tblPr
+    tblBorders = OxmlElement('w:tblBorders')
 
-def move_text_to_end(doc: Document, search_text: str, output_path: str):
-    """
-    Move the paragraph containing the ``search_text`` to the end of the document and save to the specified path.
+    # Define border settings for the table
+    border_settings = {
+        'w:top': '1',
+        'w:left': '1',
+        'w:bottom': '1',
+        'w:right': '1',
+        'w:insideH': '1',
+        'w:insideV': '1'
+    }
 
-    Parameters:
-    - **doc** (``Document``): The Document object;
-    - **search_text** (``str``): The text to search for and move;
-    - **output_path** (``str``): Path to save the modified document.
-    """
+    for border, size in border_settings.items():
+        border_elem = OxmlElement(border)
+        border_elem.set(qn('w:val'), 'single')
+        border_elem.set(qn('w:sz'), size)  # size in half-points
+        tblBorders.append(border_elem)
 
-    # Find the paragraph that contains the search text
-    para_to_move = None
-    for para in doc.paragraphs:
-        if search_text in para.text:
-            para_to_move = para
-            break
-
-    if para_to_move is None:
-        raise ValueError(f"Paragraph containing '{search_text}' not found.")
-
-    # Access the underlying XML of the document
-    doc_xml = doc._element
-    body = doc_xml.find('.//w:body', namespaces=doc_xml.nsmap)
-
-    # Remove the paragraph from its current position
-    para_element = para_to_move._element
-    body.remove(para_element)
-
-    # Append the paragraph to the end of the document
-    body.append(para_element)
-
-    # Save the modified document
-    doc.save(output_path)
+    tblPr.append(tblBorders)
 
 
 def pdf_to_text(pdf_path, output_txt):
@@ -704,6 +723,52 @@ def load_dict_from_filename(filename_path: str) -> dict:
     result_dict['Id3 [mA]'] = [id1[2], id2[2]]
 
     return result_dict
+
+
+def set_cell_borders(cell, border_size=1):
+    """Set borders for a single cell."""
+
+    # Access the underlying XML element of the cell
+    cell_element = cell._element
+
+    # Get or create the cell properties (tcPr) XML element
+    cell_pr = cell_element.get_or_add_tcPr()
+
+    # Find the tblBorders element in the cell properties, which defines border settings
+    borders = cell_pr.find(qn('w:tblBorders'))
+
+    # If the tblBorders element does not exist, create and append it
+    if borders is None:
+        borders = OxmlElement('w:tblBorders')
+        cell_pr.append(borders)
+
+    # Define border settings for different sides and inner borders
+    border_settings = {
+        'w:top': border_size,  # Top border
+        'w:left': border_size,  # Left border
+        'w:bottom': border_size,  # Bottom border
+        'w:right': border_size,  # Right border
+        'w:insideH': border_size,  # Horizontal inner borders (between cells)
+        'w:insideV': border_size  # Vertical inner borders (between cells)
+    }
+
+    # Iterate through each border setting
+    for border, size in border_settings.items():
+        # Find the specific border element within tblBorders
+        border_elem = borders.find(qn(border))
+
+        # If the border element does not exist, create and append it
+        if border_elem is None:
+            border_elem = OxmlElement(border)
+            borders.append(border_elem)
+
+        # Set the border style to 'single'
+        border_elem.set(qn('w:val'), 'single')
+
+        # Set the border size in half-points
+        border_elem.set(qn('w:sz'), str(size))
+
+    return
 
 
 def set_margins(document, top, bottom, left, right):
