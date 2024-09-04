@@ -451,7 +451,7 @@ def make_table(doc: Document, data: dict, title: str, column_widths: list, heade
     # Add a title for the table
     write_nice_heading(doc=doc, text=f"{title}", level=0,
                        font_color=RGBColor(0, 0, 0), font_name='Times New Roman',
-                       font_size=12, font_style="italic")
+                       font_size=10, font_style='normal')
 
     # Create a table with number of rows and columns (+1 for the heading)
     num_rows = len(next(iter(data.values()))) + 1
@@ -465,7 +465,7 @@ def make_table(doc: Document, data: dict, title: str, column_widths: list, heade
         head[i].text = col
         for run in head[i].paragraphs[0].runs:
             # Set font of the headers
-            run.font.bold = True
+            # run.font.bold = True
             run.font.size = Pt(header_font_size)
 
     # Add data from dictionary to the table
@@ -635,25 +635,32 @@ def write_nice_heading(doc: Document, text: str, level: int,
     - **style** (``str``): choose bold, italics or none;
     - **font_size** (``int``): size of the heading (Pt).
     """
-
-    # Define Section heading (important for authomatic table of contents)
-    heading = doc.add_heading(text, level=level)
-    run = heading.runs[0]
-
-    # Apply font properties
-    run.font.color.rgb = font_color
-    run.font.name = font_name
-    # Set heading dimension
-    run.font.size = Pt(font_size)
-
-    # Apply style
-    if font_style == "bold":
-        run.bold = True
-    elif font_style == "italic":
-        run.italic = True
-
-    # Align text to the left
-    heading.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    
+    # look for the text
+    if text == ' ':
+        return
+    
+    else:
+        # Define Section heading (important for authomatic table of contents)
+        heading = doc.add_heading(text, level=level)
+        run = heading.runs[0]
+    
+        # Apply font properties
+        run.font.color.rgb = font_color
+        run.font.name = font_name
+        # Set heading dimension
+        run.font.size = Pt(font_size)
+    
+        # Apply style
+        if font_style == "bold":
+            run.bold = True
+        elif font_style == "italic":
+            run.italic = True
+    
+        # Align text to the left
+        heading.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        
+        return
 
 
 def extract_voltage_current(bias: list) -> list:

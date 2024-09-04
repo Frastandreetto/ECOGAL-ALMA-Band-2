@@ -168,7 +168,7 @@ def main():
     # Reference Documents List
     ref_dict = fr.load_dict_from_datafile("Tables/reference_document_list.txt")
     # Make the Reference Document List Table
-    fr.make_table(doc=doc, data=ref_dict, title="\n", column_widths=[15, 43.5, 41.5], elements_font_size=8, header_font_size=10)
+    fr.make_table(doc=doc, data=ref_dict, title=" ", column_widths=[15, 43.5, 41.5], elements_font_size=8, header_font_size=10)
 
     logging.info("Section 1 completed\n"
                  "==================================================================\n")
@@ -289,7 +289,7 @@ def main():
         sect_counter = idx + 4
         fr.write_nice_heading(doc=doc, text=text, level=1,
                               font_color=RGBColor(0, 0, 0), font_name="Times New Roman",
-                              font_size=18, font_style="italic")
+                              font_size=18, font_style=None)
         # Write some text in the section
         text = f"This CLNA chain is configured as {name_LNA_1} (1st stage), and {name_LNA_2} (2nd stage)."
         fr.write_nice_text(doc=doc, text=text, output_path=output_path,
@@ -298,15 +298,20 @@ def main():
         # --------------------------------------------------------------------------------------------------------------
         # MAKE BIAS TABLES
 
-        # Add some white space before the table
-        doc.add_paragraph(' ')
-
         # BIAS TABLE 1 - Set Values
         #  =============================================================================================================
         logging.info("Creating table: recommended bias (SET VALUES).\n")
-        table_title = (f"Table {idx + 4}.1 - Bias conditions - Set Values.\n "
-                       f"Best values recommended by ESO, for 15K ambient operation.")
-
+        
+        # Writing table title
+        # Step 1: table number
+        table_title = (f"Table {idx + 4}.1 Bias conditions - Set Values.")
+        fr.write_nice_text(doc=doc, text=table_title,  output_path=output_path,
+                           font_name='Times New Roman', font_size=10, font_color=(0, 0, 0), font_style='bold')
+        # Step 2: table text
+        table_title = ("Optimized settings recommended for 15K ambient operation.")
+        fr.write_nice_text(doc=doc, text=table_title,  output_path=output_path,
+                          font_name='Times New Roman', font_size=10, font_color=(0, 0, 0), font_style=None)
+        
         # Directory of the bias txt files
         dir_path = "Bias_Txt_Files"
         # Get the filename needed
@@ -314,12 +319,12 @@ def main():
         # Load the dictionary
         data = fr.load_dict_from_filename(filename_path=f"{dir_path}/{filename}")
         # Write the set-values on the table in the doc
-        fr.make_table(doc=doc, data=data, title=table_title, column_widths=[16, 14, 14, 14, 14, 14, 14], header_font_size=8, elements_font_size=8)
+        fr.make_table(doc=doc, data=data, title=' ', column_widths=[16, 14, 14, 14, 14, 14, 14], header_font_size=8, elements_font_size=8)
         #  =============================================================================================================
-
-        # Add some white space between the two tables
+       
+        # Add some white space between the tables
         doc.add_paragraph(' ')
-
+        
         # BIAS TABLE 2 - Read out Values
         #  =============================================================================================================
         # Extract bias read out values from the datafile
@@ -329,12 +334,20 @@ def main():
         logging.debug(f"1): {name_LNA_1} \n2): {name_LNA_2}")
 
         logging.info("Creating table: first measure bias (READ OUT VALUES).\n")
-        table_title = (f"Table {idx + 4}.2 - Bias conditions - Read Out Values.\n"
-                       f"Bias values used to start the fine-tuning measurements at cryogenic conditions.")
+        
+        # Step 1: table number
+        table_title = f"Table {idx + 4}.2 Read Out Values."
+        fr.write_nice_text(doc=doc, text=table_title,  output_path=output_path,
+                           font_name='Times New Roman', font_size=10, font_color=(0, 0, 0), font_style='bold')
+        # Step 2: table text
+        table_title = "Note: for reference only, these are not necessarily taken with the final optimized bias settings."
+        fr.write_nice_text(doc=doc, text=table_title,  output_path=output_path,
+                          font_name='Times New Roman', font_size=10, font_color=(0, 0, 0), font_style=None)
+        
         # Load the dictionary reading the configuration files
         data = fr.load_dict_from_datafile(f"Tables/bias_table_{name_LNA_1}_{name_LNA_2}.txt")
         # Write the read-values on the table in the doc
-        fr.make_table(doc=doc, data=data, title=table_title, column_widths=[16, 14, 14, 14, 14, 14, 14], header_font_size=8, elements_font_size=8)
+        fr.make_table(doc=doc, data=data, title=' ', column_widths=[19, 9, 9, 9, 9, 9, 9, 9, 9, 9], header_font_size=8, elements_font_size=8)
 
         # Add some white space before the figure
         doc.add_paragraph(' ')
@@ -415,7 +428,7 @@ def main():
     text = f"Noise Temperature and Gain of all cascaded chains"
     fr.write_nice_heading(doc=doc, text=text, level=1,
                           font_color=RGBColor(0, 0, 0), font_name="Times New Roman",
-                          font_size=18, font_style="italic")
+                          font_size=18, font_style=None)
     # Add Plot of the LNA
     fr.add_figure(doc=doc, img_path=f"LNA_Plots/ALL/Plot_All.png",
                   caption_file="none", img_width=450, img_height=450)
