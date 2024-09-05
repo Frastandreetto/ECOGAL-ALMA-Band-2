@@ -5,7 +5,7 @@ This file produces reports of the LNAs performances of Band 2 ALMA-ECOGAL experi
 @author: Francesco Andreetto
 
 Created on: May 23rd 2024, European Southern Observatory (ESO), Garching Bei München (Germany)
-Last editing: September 4th 2024,  European Southern Observatory (ESO) - Garching Bei München (Germany)
+Last editing: September 6th 2024,  European Southern Observatory (ESO) - Garching Bei München (Germany)
 """
 
 # Modules & Libraries
@@ -303,14 +303,10 @@ def main():
         logging.info("Creating table: recommended bias (SET VALUES).\n")
         
         # Writing table title
-        # Step 1: table number
-        table_title = (f"Table {idx + 4}.1 Bias conditions - Set Values.")
+        table_title = (f"Table {idx + 4}.1. Bias conditions - Set Values "
+                       f"(Optimized settings recommended for 15K ambient operation)")
         fr.write_nice_text(doc=doc, text=table_title,  output_path=output_path,
                            font_name='Times New Roman', font_size=10, font_color=(0, 0, 0), font_style='bold')
-        # Step 2: table text
-        table_title = ("Optimized settings recommended for 15K ambient operation.")
-        fr.write_nice_text(doc=doc, text=table_title,  output_path=output_path,
-                          font_name='Times New Roman', font_size=10, font_color=(0, 0, 0), font_style=None)
         
         # Directory of the bias txt files
         dir_path = "Bias_Txt_Files"
@@ -334,15 +330,12 @@ def main():
         logging.debug(f"1): {name_LNA_1} \n2): {name_LNA_2}")
 
         logging.info("Creating table: first measure bias (READ OUT VALUES).\n")
-        
-        # Step 1: table number
-        table_title = f"Table {idx + 4}.2 Read Out Values."
+
+        table_title = (f"Table {idx + 4}.2. Read Out Values "
+                       f"(Note: "
+                       f"for reference only, these are not necessarily taken with the final optimized bias settings)")
         fr.write_nice_text(doc=doc, text=table_title,  output_path=output_path,
                            font_name='Times New Roman', font_size=10, font_color=(0, 0, 0), font_style='bold')
-        # Step 2: table text
-        table_title = "Note: for reference only, these are not necessarily taken with the final optimized bias settings."
-        fr.write_nice_text(doc=doc, text=table_title,  output_path=output_path,
-                          font_name='Times New Roman', font_size=10, font_color=(0, 0, 0), font_style=None)
         
         # Load the dictionary reading the configuration files
         data = fr.load_dict_from_datafile(f"Tables/bias_table_{name_LNA_1}_{name_LNA_2}.txt")
@@ -369,8 +362,8 @@ def main():
         lna_1_info = fr.get_file_from_string(directory_path="LNA_specifications/MPI_specifications",
                                              search_string=f"{name_LNA_1.replace('.', ' ')}",
                                              n_char=19)
-        text = f"Compliance verification for amplifier: {name_LNA_1}\t\t{lna_1_info}"
-        fr.write_nice_text(doc=doc, text=text, output_path=output_path, font_size=8)
+        text = f"Compliance verification for amplifier: {name_LNA_1}\t{lna_1_info}"
+        fr.write_nice_text(doc=doc, text=text, output_path=output_path, font_size=9)
 
         # 2. Test data info
         # --------------------------------------------------------------------------------------------------------------
@@ -390,9 +383,9 @@ def main():
             text = " "
         else:
             logging.debug(f"{lines[0]}\t{lines[1]}")
-            text = f"{lines[0]}\t\t{lines[1]}"
+            text = f"{lines[0]}\t{lines[1]}"
 
-        fr.write_nice_text(doc=doc, text=text, output_path=output_path, font_size=8)
+        fr.write_nice_text(doc=doc, text=text, output_path=output_path, font_size=9)
 
         # --------------------------------------------------------------------------------------------------------------
         # Applicable waiver

@@ -5,7 +5,7 @@ This file contains the main functions used in ALMA-ECOGAL project producing repo
 @author: Francesco Andreetto
 
 Created on: May 29th 2024, European Southern Observatory (ESO) - Garching Bei München (Germany)
-Last editing: September 4th 2024,  European Southern Observatory (ESO) - Garching Bei München (Germany)
+Last editing: September 6th 2024,  European Southern Observatory (ESO) - Garching Bei München (Germany)
 """
 
 # Import Modules
@@ -446,7 +446,6 @@ def make_table(doc: Document, data: dict, title: str, column_widths: list, heade
     # Validate column widths
     if sum(column_widths) != 100:
         raise ValueError("The sum of column widths percentages must equal 100.")
-
 
     # Add a title for the table
     write_nice_heading(doc=doc, text=f"{title}", level=0,
