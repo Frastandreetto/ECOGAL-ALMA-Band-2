@@ -22,7 +22,6 @@ from rich.logging import RichHandler
 logging.basicConfig(level="INFO", format='%(message)s',
                     datefmt="[%X]", handlers=[RichHandler()])
 
-#%%
 
 def main():
     # ==================================================================================================================
@@ -168,7 +167,8 @@ def main():
     # Reference Documents List
     ref_dict = fr.load_dict_from_datafile("Tables/reference_document_list.txt")
     # Make the Reference Document List Table
-    fr.make_table(doc=doc, data=ref_dict, title=" ", column_widths=[15, 43.5, 41.5], elements_font_size=8, header_font_size=10)
+    fr.make_table(doc=doc, data=ref_dict, title=" ",
+                  column_widths=[15, 43.5, 41.5], elements_font_size=8, header_font_size=10)
 
     logging.info("Section 1 completed\n"
                  "==================================================================\n")
@@ -315,7 +315,8 @@ def main():
         # Load the dictionary
         data = fr.load_dict_from_filename(filename_path=f"{dir_path}/{filename}")
         # Write the set-values on the table in the doc
-        fr.make_table(doc=doc, data=data, title=' ', column_widths=[16, 14, 14, 14, 14, 14, 14], header_font_size=8, elements_font_size=8)
+        fr.make_table(doc=doc, data=data, title=' ',
+                      column_widths=[16, 14, 14, 14, 14, 14, 14], header_font_size=8, elements_font_size=8)
         #  =============================================================================================================
        
         # Add some white space between the tables
@@ -340,7 +341,8 @@ def main():
         # Load the dictionary reading the configuration files
         data = fr.load_dict_from_datafile(f"Tables/bias_table_{name_LNA_1}_{name_LNA_2}.txt")
         # Write the read-values on the table in the doc
-        fr.make_table(doc=doc, data=data, title=' ', column_widths=[19, 9, 9, 9, 9, 9, 9, 9, 9, 9], header_font_size=8, elements_font_size=8)
+        fr.make_table(doc=doc, data=data, title=' ',
+                      column_widths=[19, 9, 9, 9, 9, 9, 9, 9, 9, 9], header_font_size=8, elements_font_size=8)
 
         # Add some white space before the figure
         doc.add_paragraph(' ')

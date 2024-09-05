@@ -64,8 +64,9 @@ def add_figure(doc: Document, img_path: str, caption_file: str, img_width=400, i
 def create_waivers_file(input_file_path: str, directory_path_MPI: str, directory_path_LNF: str,
                         output_file_name='Tables/CLNA_waivers.txt'):
     """
-    Read from an input file the names of the LNAs used in the analysis, then look for waiver files into two directories,
-    one per LNA-type of the chain, and create an output files in which writes the names of these files, if found.
+    Read from an input file the names of the LNAs used in the analysis,
+    then look for waiver files into two directories, one per LNA-type (LNF/MPI) of the chain,
+    and create an output files in which writes the names of these files, if found.
 
     Parameters:\n
     - **input_file_path** (``str``): path of the input file in which are written the names of the LNAs analyzed;
@@ -113,7 +114,7 @@ def create_waivers_file(input_file_path: str, directory_path_MPI: str, directory
                 else:
                     # Get the file name from the serial number LNF-XXXX
                     logging.debug(lna[-4:])
-                    filename = get_file_from_string(directory_path_LNF, f"waiver_{lna[-4:]}", n_char="all")
+                    filename = get_file_from_string(directory_path_LNF, f"ESO_{lna[-4:]}", n_char="all")
                     if filename == "":
                         pass
                     else:
