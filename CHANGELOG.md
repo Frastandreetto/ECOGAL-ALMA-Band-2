@@ -5,6 +5,7 @@
 🚀 Upgrade of the script to produce the reports of the tests of cascaded-LNAs-chains conducted @ ESO, Garching Bei Munchen [#2](https://github.com/Frastandreetto/ECOGAL-ALMA-Band-2/pull/2).
 
 💠 Adding some useful tools and functions;
+
 💠 Adding the tutorial for the Report Script. 
 
 # Version 0.1.0
