@@ -5,11 +5,10 @@ This file produces reports of the LNAs performances of Band 2 ALMA-ECOGAL experi
 @author: Francesco Andreetto
 
 Created on: May 23rd 2024, European Southern Observatory (ESO), Garching Bei München (Germany)
-Last editing: August 5th 2024, Observatory of Astrophysics and Space Science (INAF-OAS) - Bologna (Italy)
+Last editing: September 6th 2024,  European Southern Observatory (ESO) - Garching Bei München (Germany)
 """
 
 # Modules & Libraries
-
 import argparse
 import logging
 from docx import Document
@@ -146,7 +145,7 @@ def main():
                           font_color=RGBColor(0, 0, 0), font_name="Times New Roman",
                           font_size=16, font_style="normal")
     # Read Subsection 1.1
-    text = fr.read_text_from_file("Sections/pag4_sec1_1.txt")
+    text = fr.read_text_from_file("Sections/Sec1_1.txt")
     # Write Subsection 1.1
     fr.write_nice_text(doc=doc, text=text, output_path=output_path)
 
@@ -156,7 +155,7 @@ def main():
                           font_color=RGBColor(0, 0, 0), font_name="Times New Roman",
                           font_size=16, font_style="normal")
     # Read Subsection 1.2
-    text = fr.read_text_from_file("Sections/pag4_sec1_2.txt")
+    text = fr.read_text_from_file("Sections/Sec1_2.txt")
     # Write Subsection 1.2
     fr.write_nice_text(doc=doc, text=text, output_path=output_path)
 
@@ -168,7 +167,8 @@ def main():
     # Reference Documents List
     ref_dict = fr.load_dict_from_datafile("Tables/reference_document_list.txt")
     # Make the Reference Document List Table
-    fr.make_table(doc=doc, data=ref_dict, title="\n")
+    fr.make_table(doc=doc, data=ref_dict, title=" ",
+                  column_widths=[15, 43.5, 41.5], elements_font_size=8, header_font_size=10)
 
     logging.info("Section 1 completed\n"
                  "==================================================================\n")
@@ -188,7 +188,7 @@ def main():
                           font_color=RGBColor(0, 0, 0), font_name="Times New Roman",
                           font_size=18, font_style="bold")
     # Read Section 2
-    text = fr.read_text_from_file("Sections/pag5_sec2.txt")
+    text = fr.read_text_from_file("Sections/Sec2.txt")
     # Write Section 2
     fr.write_nice_text(doc=doc, text=text, output_path=output_path)
 
@@ -205,7 +205,7 @@ def main():
     # Individual CLNAs Documents TABLE
     document_dict = fr.load_dict_from_datafile("Tables/CLNA_waivers.txt")
     # Make the Reference Document List Table
-    fr.make_table(doc=doc, data=document_dict, title=" ")
+    fr.make_table(doc=doc, data=document_dict, title=" ", column_widths=[20, 66.6, 13.4])
 
     logging.info("Section 2 completed\n"
                  "==================================================================\n")
@@ -225,7 +225,7 @@ def main():
                           font_color=RGBColor(0, 0, 0), font_name="Times New Roman",
                           font_size=18, font_style="bold")
     # Read Section 3
-    text = fr.read_text_from_file("Sections/pag7_sec3.txt")
+    text = fr.read_text_from_file("Sections/Sec3.txt")
     # Write Section 3
     fr.write_nice_text(doc=doc, text=text, output_path=output_path)
 
@@ -235,7 +235,7 @@ def main():
     fr.add_figure(doc=doc, img_path=img_path, caption_file=caption_file, img_width=300, img_height=200)
 
     # Read Section 3 pt 2
-    text = fr.read_text_from_file("Sections/pag7_sec3_pt2.txt")
+    text = fr.read_text_from_file("Sections/Sec3_pt2.txt")
     # Write Section 3 pt2
     fr.write_nice_text(doc=doc, text=text, output_path=output_path)
 
@@ -245,7 +245,7 @@ def main():
     fr.add_figure(doc=doc, img_path=img_path, caption_file=caption_file, img_width=250)
 
     # Read Section 3 pt 3
-    text = fr.read_text_from_file("Sections/pag7_sec3_pt3.txt")
+    text = fr.read_text_from_file("Sections/Sec3_pt3.txt")
     # Write Section 3 pt3
     fr.write_nice_text(doc=doc, text=text, output_path=output_path)
 
@@ -276,9 +276,8 @@ def main():
     for idx, item in enumerate(plot_names):
 
         # Set margins of the section
-        fr.set_margins(doc, top=1, bottom=1, left=0.7, right=0.7)
+        fr.set_margins(doc, top=1.18, bottom=0.98, left=1.18, right=0.98)
 
-        # fr.write_chain_section(item)
         # Get the name of the first LNA
         name_LNA_1 = item[-26:-17]
 
@@ -290,7 +289,7 @@ def main():
         sect_counter = idx + 4
         fr.write_nice_heading(doc=doc, text=text, level=1,
                               font_color=RGBColor(0, 0, 0), font_name="Times New Roman",
-                              font_size=18, font_style="italic")
+                              font_size=18, font_style=None)
         # Write some text in the section
         text = f"This CLNA chain is configured as {name_LNA_1} (1st stage), and {name_LNA_2} (2nd stage)."
         fr.write_nice_text(doc=doc, text=text, output_path=output_path,
@@ -299,15 +298,16 @@ def main():
         # --------------------------------------------------------------------------------------------------------------
         # MAKE BIAS TABLES
 
-        # Add some white space before the table
-        doc.add_paragraph(' ')
-
         # BIAS TABLE 1 - Set Values
         #  =============================================================================================================
         logging.info("Creating table: recommended bias (SET VALUES).\n")
-        table_title = (f"Table {idx + 4}.1 - Bias conditions - Set Values.\n "
-                       f"Best values recommended by ESO, for 15K ambient operation.")
-
+        
+        # Writing table title
+        table_title = (f"Table {idx + 4}.1. Bias conditions - Set Values "
+                       f"(Optimized settings recommended for 15K ambient operation)")
+        fr.write_nice_text(doc=doc, text=table_title,  output_path=output_path,
+                           font_name='Times New Roman', font_size=10, font_color=(0, 0, 0), font_style='bold')
+        
         # Directory of the bias txt files
         dir_path = "Bias_Txt_Files"
         # Get the filename needed
@@ -315,12 +315,13 @@ def main():
         # Load the dictionary
         data = fr.load_dict_from_filename(filename_path=f"{dir_path}/{filename}")
         # Write the set-values on the table in the doc
-        fr.make_table(doc=doc, data=data, title=table_title)
+        fr.make_table(doc=doc, data=data, title=' ',
+                      column_widths=[16, 14, 14, 14, 14, 14, 14], header_font_size=8, elements_font_size=8)
         #  =============================================================================================================
-
-        # Add some white space between the two tables
+       
+        # Add some white space between the tables
         doc.add_paragraph(' ')
-
+        
         # BIAS TABLE 2 - Read out Values
         #  =============================================================================================================
         # Extract bias read out values from the datafile
@@ -330,12 +331,18 @@ def main():
         logging.debug(f"1): {name_LNA_1} \n2): {name_LNA_2}")
 
         logging.info("Creating table: first measure bias (READ OUT VALUES).\n")
-        table_title = (f"Table {idx + 4}.2 - Bias conditions - Read Out Values.\n"
-                       f"Bias values used to start the fine-tuning measurements at cryogenic conditions.")
+
+        table_title = (f"Table {idx + 4}.2. Read Out Values "
+                       f"(Note: "
+                       f"for reference only, these are not necessarily taken with the final optimized bias settings)")
+        fr.write_nice_text(doc=doc, text=table_title,  output_path=output_path,
+                           font_name='Times New Roman', font_size=10, font_color=(0, 0, 0), font_style='bold')
+        
         # Load the dictionary reading the configuration files
         data = fr.load_dict_from_datafile(f"Tables/bias_table_{name_LNA_1}_{name_LNA_2}.txt")
         # Write the read-values on the table in the doc
-        fr.make_table(doc=doc, data=data, title=table_title)
+        fr.make_table(doc=doc, data=data, title=' ',
+                      column_widths=[19, 9, 9, 9, 9, 9, 9, 9, 9, 9], header_font_size=8, elements_font_size=8)
 
         # Add some white space before the figure
         doc.add_paragraph(' ')
@@ -357,8 +364,8 @@ def main():
         lna_1_info = fr.get_file_from_string(directory_path="LNA_specifications/MPI_specifications",
                                              search_string=f"{name_LNA_1.replace('.', ' ')}",
                                              n_char=19)
-        text = f"Compliance verification for amplifier: {name_LNA_1}\t\t{lna_1_info}"
-        fr.write_nice_text(doc=doc, text=text, output_path=output_path, font_size=8)
+        text = f"Compliance verification for amplifier: {name_LNA_1}\t{lna_1_info}"
+        fr.write_nice_text(doc=doc, text=text, output_path=output_path, font_size=9)
 
         # 2. Test data info
         # --------------------------------------------------------------------------------------------------------------
@@ -378,9 +385,9 @@ def main():
             text = " "
         else:
             logging.debug(f"{lines[0]}\t{lines[1]}")
-            text = f"{lines[0]}\t\t{lines[1]}"
+            text = f"{lines[0]}\t{lines[1]}"
 
-        fr.write_nice_text(doc=doc, text=text, output_path=output_path, font_size=8)
+        fr.write_nice_text(doc=doc, text=text, output_path=output_path, font_size=9)
 
         # --------------------------------------------------------------------------------------------------------------
         # Applicable waiver
@@ -413,10 +420,10 @@ def main():
 
     # Write the heading of the section
     sect_counter += 1
-    text = f"Summary of all CLNAs performance"
+    text = f"Noise Temperature and Gain of all cascaded chains"
     fr.write_nice_heading(doc=doc, text=text, level=1,
                           font_color=RGBColor(0, 0, 0), font_name="Times New Roman",
-                          font_size=18, font_style="italic")
+                          font_size=18, font_style=None)
     # Add Plot of the LNA
     fr.add_figure(doc=doc, img_path=f"LNA_Plots/ALL/Plot_All.png",
                   caption_file="none", img_width=450, img_height=450)

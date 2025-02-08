@@ -2,7 +2,7 @@
 """
 Created on Tuesday 21st of May 2024
 
-Read all txt files containing data on Gain and Noise T in the selected directory.
+Read all txt files containing data of LNAs cascaded chains with measures of Gain and Noise T in the selected directory.
 Then create single plots for every file and a conclusive plot with all the measures of the files.
 It produces the plots 3 times: the 2nd and 3rd plots have also some horizontal lines with the specifications required.
 
