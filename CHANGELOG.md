@@ -1,5 +1,9 @@
 # HEAD
 
+# Version 0.2.0
+
+Uniform the names of the files: scripts that start with "FA" are to be run from the terminal. [#3]
+
 # Version 0.1.1
 
 🚀 Upgrade of the script to produce the reports of the tests of cascaded-LNAs-chains conducted @ ESO, Garching Bei Munchen [#2](https://github.com/Frastandreetto/ECOGAL-ALMA-Band-2/pull/2).
